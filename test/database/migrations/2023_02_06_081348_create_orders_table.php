@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('order_name');
             $table->string('oredr_number');
             $table->integer('order_count');
+            $table->decimal('total_fee')->nullable();
             $table->enum('order_status', ['Pending', 'Active'])->default('Pending');
             $table->foreignId('user_id')->constrained();
             $table->timestamps();

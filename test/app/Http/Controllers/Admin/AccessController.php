@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Admin\UserListsResource;
 use App\Models\Access;
+use App\Models\Order;
+use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -16,7 +19,7 @@ class AccessController extends Controller
      */
     public function index()
     {
-        return Access::all();
+        //
     }
 
     /**
@@ -46,9 +49,33 @@ class AccessController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+
+    public function viewUser (Request $request)
     {
-        //
+        
+
+    
+    }
+
+    public function addPermission (Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return response('user not found');
+        }
+
+        $user->attachPermission(Permission::where('id', $request->permId)->first());
+    }
+
+    public function show(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response('user not found');
+        }
+
+        return new UserListsResource($user);
     }
 
     /**
@@ -85,26 +112,4 @@ class AccessController extends Controller
         //
     }
 
-    public function addUser (Request $request, $access_id)
-    {
-        $email = $request->email;
-        $user = User::where('email', $email)->get();
-
-        if (!$user) {
-            return response([
-                'status' => 'fail',
-                'message' => 'there is not any user with this email'
-            ]);
-        }
-
-        $access = Access::where('id', $access_id)->permissions;
-        dd($access);
-
-        dd($access);
-
-        $user->attachPermissions($access->toArray());
-
-
-
-    }
 }

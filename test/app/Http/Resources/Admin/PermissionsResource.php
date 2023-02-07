@@ -2,10 +2,9 @@
 
 namespace App\Http\Resources\Admin;
 
-use App\Http\Resources\OrdersResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class UserListsResource extends JsonResource
+class PermissionsResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,12 +14,8 @@ class UserListsResource extends JsonResource
      */
     public function toArray($request)
     {
-        //return parent::toArray($request);
         return [
-            'email' => $this->email,
-            'role'  => $this->role,
-            'orders' => OrdersResource::collection($this->orders),
-            'permissions' => PermissionsResource::collection($this->permissions),
+            'permission_name' => $this->name
         ];
     }
 }

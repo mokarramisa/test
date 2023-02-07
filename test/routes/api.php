@@ -29,4 +29,5 @@ Route::post('add-permissions/ {permission_id}', [PermissionsController::class, '
 
 Route::resource('/admin/users', UserController::class);
 
-Route::post('/admin/users/add-user/{1}', AccessController::class, 'addUser');
+Route::post('/admin/users/view-user', [UserController::class, 'viewUser']);
+Route::post('/admin/users/show-user', [UserController::class, 'show']);
