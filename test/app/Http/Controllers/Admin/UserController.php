@@ -48,54 +48,36 @@ class UserController extends Controller
     public function viewUser (Request $request)
     {
         $payLoad = $request->all();
+        $adminShopId = auth()->user()->shop_id;
+
+        $orderingFilter = [
+            'registeration_time' => User::registerationTime($adminShopId),
+            'orders_count'       => User::orderCount($adminShopId),
+            'total_fee'          => User::fee($adminShopId)
+        ];
+        $statusFilter = [
+            'not purchased' => 'Pending',
+            'purchased'     => 'Success'
+        ];
 
         if (is_null($payLoad)) {
-            $user = User::all();
+            $user = User::where('shop_id', $adminShopId)->get();
             return UserListsResource::collection($user);
         }
 
-        $statusFilter = [
-            'not purchased' => false,
-            'purchased'     => true
-        ];
-
-        if ($request->status == 'not purchased') {
-
-            //dd(Order::find(1)->user);
-            $users = Order::where('order_status', 'Pending')->user;
-            dd($users);
-            //$users = Order::find(1)->user;
-            //$users = Order::where('order_status', 'active')->user;
-            //dd($users);
-            //return UserListsResource::collection($user);
-
-
-            $users = User::with(['orders' => function ($query) {
-                $query->where('oredr_number', '123');
-            }])->get();
-
-            dd($users);
-        }
-
-        $ordering = [
-            'registeration_time',
-            'orders_count',
-            'total_fee'
-        ];
-
-        if ($request->ordering == 'registeration_time') {
-            $user = User::orderByDesc('created_at')->get();
+        if ($request->has('ordering')) {
+            $user = $orderingFilter[$request->ordering];
             return UserListsResource::collection($user);
         }
 
-        if ($request->ordering == 'orders_count') {
-            $user = User::with('orders')->withCount('orders')->orderByDesc('orders_count')->get();
-            return UserListsResource::collection($user);
-        }
+        if ($request->has('status')) {
+            $orders = Order::where('order_status', $statusFilter[$request->status])->get();
+            
+            foreach ($orders as $order) {
+                $user[] = $order->user()->where('shop_id', $adminShopId)->first();    
+            }
 
-        if ($request->ordering == 'total_fee') {
-            $user = User::withSum('orders', 'total_fee')->orderByDesc('orders_sum_total_fee')->get();
-            return UserListsResource::collection($user);
+            return UserListsResource::collection(collect(array_filter($user, 'strlen')));
         }
     }
 

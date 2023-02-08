@@ -13,16 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::disableForeignKeyConstraints();
+        Schema::create('shops', function (Blueprint $table) {
             $table->id();
-            $table->string('order_name');
-            $table->string('order_number');
-            $table->integer('order_count');
-            $table->decimal('total_fee');
-            $table->enum('order_status', ['Pending', 'Active'])->default('Pending');
+            $table->string('shop_name');
+            $table->foreignId('customer_id')->constrained();
             $table->foreignId('user_id')->constrained();
             $table->timestamps();
         });
+        Schema::enableForeignKeyConstraints();
     }
 
     /**
@@ -32,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('shops');
     }
 };

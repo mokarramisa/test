@@ -23,6 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'shop_id'
     ];
 
     /**
@@ -57,5 +58,20 @@ class User extends Authenticatable
     public function Orders ()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function scopeRegisterationTime ($query, $adminShopId)
+    {
+        return $query->where('shop_id', $adminShopId)->orderByDesc('created_at')->get();
+    }
+
+    public function scopeOrderCount ($query, $adminShopId)
+    {
+        return $query->where('shop_id', $adminShopId)->with('orders')->withCount('orders')->orderByDesc('orders_count')->get();
+    }
+
+    public function scopeFee ($query, $adminShopId)
+    {
+        return $query->where('shop_id', $adminShopId)->withSum('orders', 'total_fee')->orderByDesc('orders_sum_total_fee')->get();
     }
 }
