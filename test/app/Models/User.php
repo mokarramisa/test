@@ -60,6 +60,16 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
+    public function shops ()
+    {
+        return $this->belongsToMany(User::class);
+    }
+
+    public function promotions ()
+    {
+        return $this->belongsToMany(User::class);
+    }
+
     public function scopeRegisterationTime ($query, $adminShopId)
     {
         return $query->where('shop_id', $adminShopId)->orderByDesc('created_at')->get();
